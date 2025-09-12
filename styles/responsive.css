@@ -102,6 +102,22 @@
     .bubble {
         margin-left: 5vw!important;
     }
+    .about-title img{
+        width: 250px!important;
+        left:calc(50% - 125px)!important;
+        top:10%!important;
+        /* top: 10px!important; */
+    }
+    .wave-top-img, .top-bar {
+        height: 350px!important;
+        
+    }
+    .about-title.me img { 
+     
+        width:100px!important;
+        left:calc(50vw - 50px)!important;
+        top:0px!important;
+    }
 }
 @media (max-height: 850px) and (min-height: 601px) {
    .main-content {
