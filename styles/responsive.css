@@ -95,7 +95,7 @@
  
     
 }
-@media screen and (max-width: 500px) {
+@media  (max-width: 500px) {
      .bubble-row .bubble:nth-child(even) {
         margin-right: 5vw!important; 
     }
@@ -110,7 +110,7 @@
     }
     .wave-top-img, .top-bar {
         height: 350px!important;
-        
+         
     }
     .about-title.me img { 
      
