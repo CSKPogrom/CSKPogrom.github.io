@@ -560,7 +560,7 @@
                     const letters = word.toUpperCase().split('');
                     // Sprawdź czy każda litera z morseLetters znajduje się w słowie
                     if (morseLettersUpper.every(letter => letters.includes(letter))) {
-                        results.push(word + ' : 3.' + data.mors.password[word]);
+                        results.push(word + ' : 3.' + data.mors.password[word]+"</br>");
                     }
                 }
                 if(results.length === 0) {
@@ -617,7 +617,7 @@
                 const input = document.getElementById('morse-input').value.trim().replaceAll(',', '.');
                 const alphabet = translateMorse(input);
                 const translation = findWordsByMorseLetters(alphabet.split(''));
-                showPopup('Przełożone:</br>' + translation);
+                showPopup('Przełożone: </br>' + translation);
             });
             document.getElementById('check-cable-btn').addEventListener('click', function() {
                 const selected = [];
