@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body{
+            background-color: grey;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border:1px solid black;
+            padding: 10px;
+        }
+
+        .item {
+            display: flex;
+            gap: 10px;
+            font-size: 27px;
+            color:#f8f7f7
+        }
+
+        .item.full-width {
+            width: 100%;
+            flex-basis: 100%;
+        }
+
+        .cable, .check-cable {
+            color:white;
+            height: 20px;
+            width:20px;
+            text-align: center;
+            margin: 10px;
+            margin-top:0;
+            display: inline-block;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .check-cable {
+            background-color: gray;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .password-input {
+            width: 60px;
+            height: 30px;
+            margin: 10px;
+            padding: 5px;
+            font-size: 14px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            text-transform: uppercase;
+            font-family: Arial, sans-serif;
+        }
+        
+        .password-input:focus {
+            outline: none;
+            border-color: #333;
+        }
+        
+        .check-password-btn, .check-cable-btn , .check-cables-btn, .check-mors-btn, .clear-mors-btn, .clear-password-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        
+        .check-password-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .password-result {
+            margin: 10px;
+            font-weight: bold;
+            min-height: 20px;
+        }
+        
+        .password-result.success {
+            color: green;
+        }
+        
+        .password-result.error {
+            color: red;
+        }
+        .cable.red {
+            background-color: red;
+        }
+        .cable.black {
+            background-color: black;
+        }
+        .cable.blue {
+            background-color: blue;
+        }
+        /* Grid dla kabli: 3 kolumny x 3 wiersze */
+        .item.cable-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 240px; /* dopasuj jeśli chcesz większe/ mniejsze kwadraty */
+        }
+
+        .item.cable-grid .cable {
+            margin: 0;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+        /* Popup overlay and box */
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            
+        }
+
+        /* Ensure HTML `hidden` attribute actually hides the overlay */
+        .popup-overlay[hidden] {
+            display: none !important;
+        }
+
+        .popup-box {
+            background: #fff;
+            color: #111;
+            font-size:48px;
+            padding: 18px 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            max-width: 90%;
+            width: 560px;
+        }
+
+        .popup-content {
+            margin-bottom: 8px;
+            white-space: pre-line;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .popup-close-btn {
+            display: inline-block;
+            margin-left: 8px;
+            background: #eee;
+            border-radius: 6px;
+            padding: 6px 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .cable-checkbox-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cable-checkbox-wrapper label {
+            font-weight: bold;
+            font-size: 24px;
+            color:white;
+        }
+        
+        .password-inputs-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+.cable-label {
+    font-weight: bold;
+            font-size: 24px;
+            color:white;
+}
+        .password-inputs-row > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .password-inputs-row label {
+            font-weight: bold;
+            font-size: 24px;
+            color:white;
+        }
+        /* Memory grid 4x4 */
+        .memory-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .memory-grid-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .memory-headers {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .memory-headers div {
+            text-align: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            gap: 8px;
+        }
+
+        .memory-grid button {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: #222;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .memory-description {
+            color: white;
+            font-size: 24px;
+            line-height: 1.6;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="row">
+            <div class="item full-width">Kable</div>
+            <div class="item full-width" style="flex-direction: column;">
+                <form id="cable" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                   
+                    <div class="cable-checkbox-wrapper">
+                        <label for="cable-red">red</label>
+                        <input type="checkbox" name="color" class="cable-checkbox" id="cable-red" value="r">
+                    </div>
+                    <div class="cable-checkbox-wrapper">
+                        <label for="cable-blue">blue</label>
+                        <input type="checkbox" name="color" class="cable-checkbox" id="cable-blue" value="b">
+                    </div>
+                    <div class="cable-checkbox-wrapper">
+                        <label for="cable-star">star</label>
+                        <input type="checkbox" class="cable-checkbox" id="cable-star" value="s">
+                    </div>
+                    <div class="cable-checkbox-wrapper">
+                        <label for="cable-led">led</label>
+                        <input type="checkbox" class="cable-checkbox" id="cable-led" value="l" >
+                    </div>
+                </form>
+
+            </div>
+            <div class="item full-width">
+                <button class="check-cable-btn" id="check-cable-btn">Sprawdź</button>
+                <button class="check-cable-btn" id="clear-cable-btn">Wyczyść</button>
+            </div>
+        </div>
+        <div class="row">
+            
+            <div class="item full-width">Kable kolorowe ABC ( przecinanie)</div>
+            
+            <div class="item cable-grid">
+                <div id="red" class="cable red" data-letter="a">A</div>
+                <div id="red" class="cable red" data-letter="b">B</div>
+                <div id="red" class="cable red" data-letter="c">C</div>
+                <div id="black" class="cable black" data-letter="a">A</div>
+                <div id="black" class="cable black" data-letter="b">B</div>
+                <div id="black" class="cable black" data-letter="c">C</div>
+                <div id="blue" class="cable blue" data-letter="a">A</div>
+                <div id="blue" class="cable blue" data-letter="b">B</div>
+                <div id="blue" class="cable blue" data-letter="c">C</div>
+            </div>
+            <div class="item full-width"><button class="check-cables-btn" id="reset-cables-btn">Resetuj</button></div>
+            
+        </div>
+        <div class="row">
+            <div class="item full-width">Hasła</div>
+            <div class="item full-width">
+                <input type="text" class="password-input" id="pass-input-0" >
+                <input type="text" class="password-input" id="pass-input-1" >
+                <input type="text" class="password-input" id="pass-input-2" >
+                <input type="text" class="password-input" id="pass-input-3" >
+                <input type="text" class="password-input" id="pass-input-4">
+            </div>
+            <div class="item full-width">
+                <button class="check-password-btn" id="check-password-btn">Sprawdź</button>
+                <button class="check-password-btn" id="clear-password-btn">Wyczyść</button>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="item full-width">Pamieciówka</div>
+            <div class="item full-width">
+                <div class="memory-container">
+                    <textarea style="width: 200px; height: 200px;  border-radius: 6px; padding: 10px; font-size: 16px;" >
+
+                    </textarea>
+                </div>
+            </div>
+            <div class="item full-width">
+                <button class="clear-memory-btn" id="clear-cable-btn">Wyczyść</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="item full-width">MORS<br>
+            Przecinek lub kropka oznacza kropkę, kreske oznacza / </div>
+            <div class="item full-width" style="flex-direction: column;">
+                <form id="morse" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                   
+                    <div class="cable-checkbox-wrapper">
+
+                        <input type="text" name="color" class="morse-input" id="morse-input" value="" style="width:350px;height:60px;font-size:32px;">
+                    </div>
+                    
+                </form>
+
+            </div>
+            <div class="item full-width">
+                <button class="check-mors-btn" id="check-mors-btn">Sprawdź</button>
+                <button class="clear-mors-btn" id="clear-mors-btn">Wyczyść</button>
+            </div>
+        </div>
+        <div class="row">
+            
+            <div class="item ">
+                <button class="check-password-btn" id="reset-btn">Resetuj</button>
+            </div>
+
+        </div>
+    </div>
+    <!-- Popup overlay (hidden by default using the hidden attribute) -->
+    <div id="popup-overlay" class="popup-overlay" hidden>
+        <div class="popup-box" role="dialog" aria-modal="true" aria-labelledby="popup-content">
+            <div id="popup-content" class="popup-content"></div>
+            <button id="popup-close" class="popup-close-btn" aria-label="Zamknij">OK</button>
+        </div>
+    </div>
+    <script>
+        var data = {
+            memory : {
+                stages: {
+                    0 : {
+                        position:0,
+                        number:0,
+                    },
+                    1 : {
+                        position:0,
+                        number:0,
+                    }, 
+                    2 : {
+                        position:0,
+                        number:0,
+                    },
+                    3 : {
+                        position:0,
+                        number:0,
+                    },
+                    4 : {
+                        position:0,
+                        number:0,
+                    }
+
+                }
+            },
+            password : {
+                pass : [
+                    "alarm", "apacz", "arena", "babka", "cecha",
+                    "ekipa", "fajka", "farma", "głowa", "hańba",
+                    "larwa", "laska", "macka", "obiad", "palec",
+                    "palma", "pegaz", "robak", "scena", "skrót",
+                    "smoła", "smycz", "tafla", "teren", "toast",
+                    "torba", "trasa", "twarz", "walka", "wełna",
+                    "wnęka", "zakaz", "zwiad", "znicz", "żniwa"
+                ]
+            },
+            cable:{ /* 
+                
+                
+                w - white (biały) 
+                    r - red (czerwony)
+                    b - blue    (niebieski)
+                    s - star    (gwiazdka)
+                    l - led (lampka led)
+                
+                */
+                "w":{
+                    "w" : "Przetnij",
+                    "l" : "Nie przecinaj",
+                    "s" : "Przetnij",
+                    "sl" : "Przetnij przewód, jeśli bomba ma dwie lub więcej baterii"
+                },
+                "b":{
+                    "b" : "Przetnij przewód, jeśli ostatnia cyfra numeru seryjnego jest parzysta.",
+                    "bs" : "Nie przecinaj",
+                    "bl" : "Przetnij przewód, jeśli bomba ma port równlogeły",
+                    "bsl" : "Przetnij przewód, jeśli bomba ma port równlogeły"
+                },
+                "r":{
+                    "r" : "Przetnij przewód, jeśli ostatnia cyfra numeru seryjnego jest parzysta.",
+                    "rs" : "Przetnij",
+                    "rl" : "Przetnij przewód, jeśli bomba ma dwie lub więcej baterii",
+                    "rsl" : "Przetnij przewód, jeśli bomba ma dwie lub więcej baterii"
+
+                },
+                "rb" : {
+                    "rb" : "Przetnij przewód, jeśli ostatnia cyfra numeru seryjnego jest parzysta.",
+                    "rbs" : "Przetnij jeśli bomba ma port równoległy",
+                    "rbl" : "Przetnij przewód, jeśli ostatnia cyfra numeru seryjnego jest parzysta",
+                    "rbsl" : "Nie przecinaj",
+                }
+                
+            },
+            mors: {
+                alfabet : {
+                    "./": "A",
+                    "/...": "B",
+                    "/./.": "C",
+                    "/..": "D",
+                    ".": "E",
+                    "../.": "F",
+                    "//.": "G",
+                    "....": "H",
+                    "..": "I",
+                    ".///": "J",
+                    "/./": "K",
+                    "./..": "L",
+                    "//": "M",
+                    "/.": "N",
+                    "///": "O",
+                    ".//.": "P",
+                    "//./": "Q",
+                    "./.": "R",
+                    "...": "S",
+                    "/": "T",
+                    "../": "U",
+                    ".../": "V",
+                    ".//": "W",
+                    "/../": "X",
+                    "/.//": "Y",
+                    "//..": "Z",
+                    "././": "Ą",
+                    "/./..": "Ć",
+                    "../..": "Ę",
+                    "./..-": "Ł",
+                    "//.//": "Ń",
+                    "///.": "Ó",
+                    ".../.": "Ś",
+                    "//..-.": "Ź",
+                    "//..-": "Ż"
+                },
+                password :{ 
+                    "drzwi": 505,
+                    "arbuz": 515,
+                    "kakao": 522,
+                    "rzeka": 532,
+                    "broda": 535,
+                    "rower": 542,
+                    "obraz": 545,
+                    "ponton": 552,
+                    "barka": 555,
+                    "bomby": 565,
+                    "szafa": 572,
+                    "zamek": 575,
+                    "lampa": 582,
+                    "indyk": 592,
+                    "pojazd": 595,
+                    "harfa": 600
+                    
+                }
+            },
+            color_cable: {
+                count : {
+                    "red" : 0,
+                    "black" : 0,
+                    "blue" : 0,
+                },
+                cable_info : {
+                   "red" : {
+                        0 : "c",
+                        1 : "b",
+                        2 : "a",
+                        3 : "ac",
+                        4 : "b",
+                        5 : "ac",
+                        6: "abc",
+                        7: "ab",
+                        8: "b"
+                    
+                    },
+                    "black" : {
+                        0: "abc",
+                        1: "ac",
+                        2: "b",
+                        3: "ac",
+                        4: "b",
+                        5: "bc",
+                        6: "ab",
+                        7: "c",
+                        8: "c"
+                    },
+                    "blue" : {
+                        0: "b",
+                        1: "ac",
+                        2: "b",
+                        3: "a",
+                        4: "b",
+                        5: "bc",
+                        6: "c",
+                        7: "ac",
+                        8: "a"
+                    }
+                }
+            }
+                
+        }
+        
+        window.addEventListener('load', function() {
+            function findWordsByMorseLetters(morseLetters) {
+                /**
+                 * Znajduje słowa zawierające CO NAJMNIEJ podane litery Morse'a
+                 * @param morseLetters - tablica liter: ["A", "B", "C"]
+                 * @returns - lista słów zawierających te litery
+                 */
+                const morseLettersUpper = morseLetters.map(l => l.toUpperCase());
+                const results = [];
+                
+                for (const word in data.mors.password) {
+                    const letters = word.toUpperCase().split('');
+                    // Sprawdź czy każda litera z morseLetters znajduje się w słowie
+                    if (morseLettersUpper.every(letter => letters.includes(letter))) {
+                        results.push(word);
+                    }
+                }
+                if(results.length === 0) {
+                    return "Brak słów zawierających wszystkie podane litery!";
+                }
+                return results;
+            }
+
+            function translateMorse(morseCode) {
+                /**
+                 * Tłumaczy kod Morse'a na litery
+                 * Format: "./" oznacza A, "/..." oznacza B itd
+                 * Spacje dzielą poszczególne znaki
+                 * @param morseCode - string: "./ /... /./" tłumaczy na "ABC"
+                 * @returns - string z przetłumaczonymi literami
+                 */
+                const codes = morseCode.trim().split(' ');
+                let result = '';
+                
+                for (const code of codes) {
+                    const letter = data.mors.alfabet[code];
+                    if (letter) {
+                        result += letter;
+                    } else {
+                        result += '?'; // znak nieznany
+                    }
+                }
+                
+                return result;
+            }
+            document.querySelectorAll('.cable').forEach(function(cable) {
+
+                cable.addEventListener('click', function() {
+                    const color = ['red', 'black', 'blue'].find(c => cable.classList.contains(c));
+                    if (!color) return;
+                    data.color_cable.cable_info[color][data.color_cable.count[color]].includes(cable.dataset.letter) ? showPopup("Przetnij") : showPopup("Nie przecinaj");
+                    data.color_cable.count[color]++;
+                    
+                    
+                   
+                });
+            });
+            document.getElementById('clear-cable-btn').addEventListener('click', function() { 
+                document.getElementById('cable').reset();
+                document.querySelectorAll('input.cable-checkbox').forEach(radio => {
+                    radio.checked = false;
+                });
+            });
+            document.getElementById('clear-mors-btn').addEventListener('click', function() { 
+                document.getElementById('morse').reset();
+  
+            });
+            document.getElementById('check-mors-btn').addEventListener('click', function() { 
+                const input = document.getElementById('morse-input').value.trim().replaceAll(',', '.');
+                const alphabet = translateMorse(input);
+                const translation = findWordsByMorseLetters(alphabet.split(''));
+                showPopup('Przełożone:</br>' + translation);
+            });
+            document.getElementById('check-cable-btn').addEventListener('click', function() {
+                const selected = [];
+                document.querySelectorAll('input.cable-checkbox:checked').forEach(function(checkbox) {
+                    console.log(checkbox.value);
+                    selected.push(checkbox.value);
+                });
+                if (selected.length === 0) {
+                    showPopup('Nie wybrano żadnego kabla!');
+                    return;
+                }
+                console.log(selected)
+
+                // determine selected cables compactly
+                const s = selected.join('');
+                const hasR = s.includes('r');
+                const hasB = s.includes('b');
+                const selectedCables = hasR && hasB ? 'rb' : hasR ? 'r' : hasB ? 'b' : 'w';
+
+                const dat = data.cable[selectedCables][s]
+                document.getElementById('cable').reset();
+                showPopup(dat ? dat : 'Nie ma takiej kombinacji w bazie danych!');
+
+            });
+            document.getElementById('reset-cables-btn').addEventListener('click', function() {
+                document.querySelectorAll('.cable').forEach(function(cable) {
+                    cable.classList.remove('selected');
+                });
+                data.color_cable.count.red = 0;
+                data.color_cable.count.black = 0;
+                data.color_cable.count.blue = 0;
+            });
+            // Funkcja do czyszczenia inputów i wyniku
+            document.getElementById('clear-password-btn').addEventListener('click', function() {
+                for (let i = 0; i < 5; i++) {
+                    document.getElementById('pass-input-' + i).value = '';
+                }
+                const resultElement = document.getElementById('password-result');
+                resultElement.textContent = '';
+                resultElement.className = 'password-result';
+            });
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                // Wyczyść password inputy
+                for (let i = 0; i < 5; i++) {
+                    document.getElementById('pass-input-' + i).value = '';
+                }
+                
+                // Wyczyść morse input
+                document.getElementById('morse-input').value = '';
+                
+                // Wyczyść textarea
+                document.querySelector('textarea').value = '';
+                
+                // Odzaznacz wszystkie checkboxy
+                document.querySelectorAll('.cable-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Resetuj liczniki kolorów
+                data.color_cable.count.red = 0;
+                data.color_cable.count.black = 0;
+                data.color_cable.count.blue = 0;
+            });
+            // Funkcja do sprawdzania hasła
+            document.getElementById('check-password-btn').addEventListener('click', function() {
+
+                // Pobranie wartości z inputów i rozbicie na pojedyncze litery (bez spacji)
+                const inputs = [];
+                for (let i = 0; i < 5; i++) {
+                    const inputText = document.getElementById('pass-input-' + i).value.toLowerCase().replace(/\s+/g, '');
+                    const letters = inputText.split('').filter(l => l.length > 0);
+                    inputs.push(letters);
+                }
+                console.log(inputs);
+                // Początkowa lista to wszystkie słowa z bazy
+                let matchingWords = data.password.pass;
+
+                // Dla każdego inputu (pozycja w słowie)
+                for (let position = 0; position < 5; position++) {
+                    const possibleLetters = inputs[position];
+                    
+                    // Jeśli input pusty, pomiń filtrację dla tej pozycji
+                    if (possibleLetters.length === 0) continue;
+
+                    // Filtruj słowa - musi mieć jedną z liter na tej pozycji
+                    matchingWords = matchingWords.filter(word => {
+                        return possibleLetters.includes(word[position]);
+                    });
+
+                    // Jeśli nie ma już żadnych słów, przerwij
+                    if (matchingWords.length === 0) {
+                        showPopup('Brak słów pasujących do podanych liter!');
+
+                        return;
+                    }
+                }
+
+                // Wyświetl wynik
+                const resultElement = document.getElementById('password-result');
+                if (matchingWords.length >= 1) {
+                    showPopup('Znalezione słowa:<br>' + matchingWords.join(', ').toUpperCase());
+                } else {
+                    showPopup('Brak słów pasujących do podanych liter!');
+                }
+            });
+
+                // Popup: odniesienia i funkcje show/close
+                const popupOverlay = document.getElementById('popup-overlay');
+                const popupContent = document.getElementById('popup-content');
+                const popupCloseBtn = document.getElementById('popup-close');
+                var ts = null
+                function closePopup() {
+                    if (!popupOverlay) return;
+                    popupOverlay.hidden = true;
+                    if(ts) {
+                        clearTimeout(ts);
+                        ts = null
+                    }
+                    document.removeEventListener('keydown', onKeyDown);
+                }
+
+                function onKeyDown(e) {
+                    if (e.key === 'Escape') closePopup();
+                }
+
+                function showPopup(text) {
+                    if (!popupOverlay) return;
+                    popupContent.innerHTML = text;
+                    popupOverlay.hidden = false;
+                    // add key listener
+                    setTimeout(() => document.addEventListener('keydown', onKeyDown), 0);
+                   
+                }
+
+                // close on click outside popup-box
+                if (popupOverlay) {
+                    popupOverlay.addEventListener('click', function(e) {
+                        if (e.target === popupOverlay) closePopup();
+                    });
+                }
+
+                if (popupCloseBtn) popupCloseBtn.addEventListener('click', closePopup);
+
+                // expose globally so other scripts can call showPopup(text)
+                window.showPopup = showPopup;
+        });
+    </script>
+</body>
+</html>
