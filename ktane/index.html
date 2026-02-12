@@ -560,7 +560,7 @@
                     const letters = word.toUpperCase().split('');
                     // Sprawdź czy każda litera z morseLetters znajduje się w słowie
                     if (morseLettersUpper.every(letter => letters.includes(letter))) {
-                        results.push(word);
+                        results.push(word + ' : 3.' + data.mors.password[word]);
                     }
                 }
                 if(results.length === 0) {
